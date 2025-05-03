@@ -8,34 +8,35 @@ import profileRouter from "./route/profile.route.js";
 
 const app = express();
 
-// Middleware setup
+// Middleware Order Matters!
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Enhanced CORS configuration
-app.use(cors({
+// Enhanced CORS Configuration
+const corsOptions = {
   origin: ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Added OPTIONS
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'], // Explicit headers
-  credentials: true
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization',
+    'X-Requested-With',
+    'Cookie',
+    'Accept'
+  ],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
 
-// Explicitly handle preflight requests
-app.options('*', cors());
+app.use(cors(corsOptions));
+
+// Explicit OPTIONS handler for /api/v1/auth routes
+app.options('/api/v1/auth/*', cors(corsOptions));
 
 // Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/profile", profileRouter);
-
-// Test endpoints
-app.get('/change', (req, res) => {
-  res.send("Hello from the backend");
-});
-
-app.post('/change', (req, res) => {
-  console.log(req.body);
-});
 
 // Server start
 app.listen(PORT, async () => {
