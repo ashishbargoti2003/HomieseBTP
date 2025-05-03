@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     const response = await apiClient(API_GET_USER, { withCredentials: true });
                     setUserInfo(response.data.user);
                     setLoading(false);
-                } catch (e) {
+                } catch {
                     console.log("Hello");
                     router.push("/login");
                 }
